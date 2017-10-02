@@ -75,6 +75,12 @@ testdb=# SELECT * FROM pg_banner('PostgreSQL');
 
 ```
 
+## load_json_file
+
+以下のQiitaページ参照
+
+* [JSON文書を表形式にバルクロードする](https://qiita.com/nuko_yokohama/items/d19059eb04e5faa30a2d)
+
 # 作成者
 ぬこ＠横浜(@nuko_yokohama)
 
