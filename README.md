@@ -1,7 +1,11 @@
 # pg_scripts
 
+役に立つかどうかは分からないpl/pgsqlのスクリプト群。
+
 * tategaki function
 * pg_banner function
+* load_json_file
+* get_database_cluster_size 
 
 ## tategaki function
 
@@ -80,6 +84,12 @@ testdb=# SELECT * FROM pg_banner('PostgreSQL');
 以下のQiitaページ参照
 
 * [JSON文書を表形式にバルクロードする](https://qiita.com/nuko_yokohama/items/d19059eb04e5faa30a2d)
+
+## get_database_cluster_size
+
+以下のQiitaページ参照
+
+* [PostgreSQLのデータベースクラスタのサイズを汎用ファイルアクセス関数で算出する](https://qiita.com/nuko_yokohama/items/ef1e9f4941102f18f987)
 
 # 作成者
 ぬこ＠横浜(@nuko_yokohama)
