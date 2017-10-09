@@ -386,7 +386,7 @@ SELECT 2 as id , '#     # ' as tx  UNION
 SELECT 3 as id , '#     # ' as tx  UNION
 SELECT 4 as id , '######  ' as tx  UNION
 SELECT 5 as id , '#   #   ' as tx  UNION
-SELECT 6 as id , '#    #, ' as tx  UNION
+SELECT 6 as id , '#    #  ' as tx  UNION
 SELECT 7 as id , '#     # ' as tx  
 ) AS t ORDER BY id
 $function$
@@ -809,6 +809,8 @@ BEGIN
         sql := sql || '|| banner_9 ';
       WHEN '.' THEN
         sql := sql || '|| banner_priod ';
+      WHEN '!' THEN
+        sql := sql || '|| banner_ex ';
       WHEN '_' THEN
         sql := sql || '|| banner_us ';
       ELSE
@@ -816,7 +818,7 @@ BEGIN
     END CASE;
     
   END LOOP;
-  sql := sql || 'FROM ( SELECT * FROM ROWS FROM ( banner_us(), banner_priod(), sp(), sq(), banner_a(), banner_b(), banner_c(), banner_d(), banner_e(), banner_f(), banner_g(), banner_h(), banner_i(), banner_j(), banner_k(), banner_l(), banner_m(), banner_n(), banner_o(), banner_p(), banner_q(), banner_r(), banner_s(), banner_t(), banner_u(), banner_v(), banner_w(), banner_x(), banner_y(), banner_z(), banner_0(), banner_1(), banner_2(), banner_3(), banner_4(), banner_5(), banner_6(), banner_7(), banner_8(), banner_9())) as _x ' ;
+  sql := sql || 'FROM ( SELECT * FROM ROWS FROM ( banner_us(), banner_priod(), banner_ex(), sp(), sq(), banner_a(), banner_b(), banner_c(), banner_d(), banner_e(), banner_f(), banner_g(), banner_h(), banner_i(), banner_j(), banner_k(), banner_l(), banner_m(), banner_n(), banner_o(), banner_p(), banner_q(), banner_r(), banner_s(), banner_t(), banner_u(), banner_v(), banner_w(), banner_x(), banner_y(), banner_z(), banner_0(), banner_1(), banner_2(), banner_3(), banner_4(), banner_5(), banner_6(), banner_7(), banner_8(), banner_9())) as _x ' ;
 
   -- RAISE NOTICE 'last sql=%', sql;
   RETURN sql;
