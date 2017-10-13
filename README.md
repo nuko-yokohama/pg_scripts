@@ -6,6 +6,7 @@
 * pg_banner function
 * load_json_file
 * get_database_cluster_size 
+* pg_lifegame
 
 ## tategaki function
 
@@ -90,6 +91,14 @@ testdb=# SELECT * FROM pg_banner('PostgreSQL');
 以下のQiitaページ参照
 
 * [PostgreSQLのデータベースクラスタのサイズを汎用ファイルアクセス関数で算出する](https://qiita.com/nuko_yokohama/items/ef1e9f4941102f18f987)
+
+## pg_lifegame
+
+名前のとおりPostgreSQL上でライフゲームをするだけのスクリプト。
+
+pg_lifegame(scale int)
+
+scale はマップの広さを示す。8 なら 8 ✗ 8のマップを生成する。
 
 # 作成者
 ぬこ＠横浜(@nuko_yokohama)
