@@ -266,7 +266,7 @@ CREATE OR REPLACE FUNCTION pg_lifegame(scale int)
  LANGUAGE plpgsql
 AS $function$
 BEGIN
-  PERFORM pg_lifegame(scale, 3, '*', ' ');
+  PERFORM pg_lifegame(scale, 1, '*', ' ');
   RETURN 0; -- dummy (no reached)
 END;
 $function$
