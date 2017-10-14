@@ -55,7 +55,7 @@ $function$
 
 --
 -- count_lifes --
-CREATE OR REPLACE FUNCTION count_lifes(in_text text, index int, scale int)
+CREATE OR REPLACE FUNCTION count_lifes(in_text text, index int, scale int, alive_ch text)
  RETURNS int
  LANGUAGE plpgsql
  
@@ -75,21 +75,21 @@ BEGIN
     IF x > 0 THEN
       -- left-up
       c := substring(in_text, (index - scale - 1), 1);
-      IF c = '*' THEN
+      IF c = alive_ch THEN
         cnt := cnt + 1;
       END IF; 
     END IF;
 
     -- center-up
     c := substring(in_text, (index - scale), 1);
-    IF c = '*' THEN
+    IF c = alive_ch THEN
       cnt := cnt + 1;
     END IF; 
 
     IF x < scale -1 THEN
       -- right-up
       c := substring(in_text, (index - scale + 1), 1);
-      IF c = '*' THEN
+      IF c = alive_ch THEN
         cnt := cnt + 1;
       END IF; 
     END IF;
@@ -98,7 +98,7 @@ BEGIN
   -- left
   IF x > 0 THEN
     c := substring(in_text, (index - 1), 1);
-    IF c = '*' THEN
+    IF c = alive_ch THEN
       cnt := cnt + 1;
       END IF; 
   END IF;
@@ -106,7 +106,7 @@ BEGIN
   -- rigjt
   IF x < scale - 1 THEN
     c := substring(in_text, (index + 1), 1);
-    IF c = '*' THEN
+    IF c = alive_ch THEN
       cnt := cnt + 1;
       END IF; 
   END IF;
@@ -116,21 +116,21 @@ BEGIN
     IF x > 0 THEN
       -- left-down
       c := substring(in_text, (index + scale - 1), 1);
-      IF c = '*' THEN
+      IF c = alive_ch THEN
         cnt := cnt + 1;
       END IF; 
     END IF;
 
     -- center-down
     c := substring(in_text, (index + scale), 1);
-    IF c = '*' THEN
+    IF c = alive_ch THEN
       cnt := cnt + 1;
     END IF; 
 
     IF x < scale -1 THEN
       -- right-down
       c := substring(in_text, (index + scale + 1), 1);
-      IF c = '*' THEN
+      IF c = alive_ch THEN
         cnt := cnt + 1;
       END IF; 
     END IF;
@@ -141,7 +141,7 @@ END;
 $function$
 ;
 
-CREATE OR REPLACE FUNCTION transition_life(in_text text, scale int)
+CREATE OR REPLACE FUNCTION transition_life(in_text text, scale int, alive_ch text, dead_ch text)
  RETURNS text
  LANGUAGE plpgsql
 AS $function$
@@ -153,24 +153,24 @@ DECLARE
 BEGIN
   FOR i IN 1 .. scale * scale LOOP
     c := substring(in_text, i, 1);
-    lifes = count_lifes(in_text, i, scale);
-    IF c = '*' THEN
+    lifes = count_lifes(in_text, i, scale, alive_ch);
+    IF c = alive_ch THEN
       -- current cell is alive
       IF lifes = 2 OR lifes = 3 THEN
         -- alive (maintain)
-        out_text := out_text || '*';
+        out_text := out_text || alive_ch;
       ELSE
         -- dead
-        out_text := out_text || ' ';
+        out_text := out_text || dead_ch;
       END IF;
     ELSE
       -- current cell is dead
       IF lifes = 3 THEN
         -- alive (birth)
-        out_text := out_text || '*';
+        out_text := out_text || alive_ch;
       ELSE
         -- dead (maintain)
-        out_text := out_text || ' ';
+        out_text := out_text || dead_ch;
       END IF;
     END IF;
   END LOOP;
@@ -180,7 +180,7 @@ END;
 $function$
 ;
 
-CREATE OR REPLACE FUNCTION initialize(scale int)
+CREATE OR REPLACE FUNCTION initialize(scale int, alive_ch text, dead_ch text)
  RETURNS text
  LANGUAGE plpgsql
 AS $function$
@@ -190,9 +190,9 @@ DECLARE
 BEGIN
   FOR i IN 1 .. scale * scale LOOP
     IF random() > 0.7 THEN
-      out_text := out_text || '*';
+      out_text := out_text || alive_ch;
     ELSE
-      out_text := out_text || ' ';
+      out_text := out_text || dead_ch;
     END IF;
   END LOOP;
   RETURN out_text;
@@ -200,7 +200,7 @@ END;
 $function$
 ;
 
-CREATE OR REPLACE FUNCTION count_all_lifes(in_text text, scale int)
+CREATE OR REPLACE FUNCTION count_all_lifes(in_text text, scale int, alive_ch text)
  RETURNS text
  LANGUAGE plpgsql
 AS $function$
@@ -211,7 +211,7 @@ DECLARE
 BEGIN
   FOR i IN 1 .. scale * scale LOOP
     c := substring(in_text, i, 1);
-    IF c = '*' THEN
+    IF c = alive_ch THEN
       lifes := lifes + 1;
     END IF;
   END LOOP;
@@ -223,6 +223,41 @@ $function$
 
 
 --
+-- pg_lifegame(scale int, sleep int, alive_ch text, dead_ch text)
+--
+
+CREATE OR REPLACE FUNCTION pg_lifegame(scale int, sleep int, alive_ch text, dead_ch text)
+ RETURNS int -- dummy
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+  map_text text;
+  lifes int;
+  generation int := 1;
+BEGIN
+  map_text := initialize(scale, alive_ch, dead_ch);
+  RAISE NOTICE E'\nlife game (gen=%)\n%',generation, separate_text(map_text, scale, scale);
+
+  LOOP
+    map_text := transition_life(map_text, scale, alive_ch, dead_ch);
+    generation := generation + 1;
+    RAISE NOTICE E'\nlife game (gen=%)\n%',generation, separate_text(map_text, scale, scale);
+
+    lifes := count_all_lifes(map_text, scale, alive_ch);
+    IF lifes = 0 THEN
+      map_text := initialize(scale);
+      PERFORM pg_sleep(sleep * 3);
+
+    END IF;
+   
+    PERFORM pg_sleep(sleep);
+  END LOOP;
+  RETURN 0; -- dummy (no reached)
+END;
+$function$
+;
+
+--
 -- pg_lifegame(scale int)
 --
 
@@ -230,26 +265,8 @@ CREATE OR REPLACE FUNCTION pg_lifegame(scale int)
  RETURNS int -- dummy
  LANGUAGE plpgsql
 AS $function$
-DECLARE
-  map_text text;
-  lifes int;
 BEGIN
-  map_text := initialize(scale);
-  RAISE NOTICE E'\nlife game\n%',separate_text(map_text, scale, scale);
-
-  LOOP
-    map_text := transition_life(map_text, scale);
-    RAISE NOTICE E'\nlife game\n%',separate_text(map_text, scale, scale);
-
-    lifes := count_all_lifes(map_text, scale);
-    IF lifes = 0 THEN
-      map_text := initialize(scale);
-      PERFORM pg_sleep(3);
-
-    END IF;
-   
-    PERFORM pg_sleep(1);
-  END LOOP;
+  PERFORM pg_lifegame(scale, 3, '*', ' ');
   RETURN 0; -- dummy (no reached)
 END;
 $function$

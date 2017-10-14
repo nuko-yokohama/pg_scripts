@@ -96,9 +96,15 @@ testdb=# SELECT * FROM pg_banner('PostgreSQL');
 
 名前のとおりPostgreSQL上でライフゲームをするだけのスクリプト。
 
+pg_lifegame(scale int, sleep int, alive_ch text, dead_ch text)
+
+* scale はマップの広さを示す。8 なら 8 x 8のマップを生成する。
+* sleep は世代切替間のスリープ時間(秒)
+* alive_ch, dead_ch はそれぞれ生存、死亡を表示するキャラクタを指定する。
+
 pg_lifegame(scale int)
 
-scale はマップの広さを示す。8 なら 8 ✗ 8のマップを生成する。
+ラッパー関数。sleep は1、alive_ch にはアスタリスク、dead_ch にはスペースが指定される。
 
 # 作成者
 ぬこ＠横浜(@nuko_yokohama)
