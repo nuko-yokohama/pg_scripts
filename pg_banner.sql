@@ -540,7 +540,7 @@ SELECT 3 as id , '#  # # ' as tx  UNION
 SELECT 4 as id , '# #  # ' as tx  UNION
 SELECT 5 as id , '##   # ' as tx  UNION
 SELECT 6 as id , '#    # ' as tx  UNION
-SELECT 7 as id , ' ####   ' as tx  
+SELECT 7 as id , ' ####  ' as tx  
 ) AS t ORDER BY id
 $function$
 ;
