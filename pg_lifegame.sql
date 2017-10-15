@@ -236,12 +236,14 @@ DECLARE
   generation int := 1;
 BEGIN
   map_text := initialize(scale, alive_ch, dead_ch);
-  RAISE NOTICE E'\nlife game (gen=%)\n%',generation, separate_text(map_text, scale, scale);
+  lifes := count_all_lifes(map_text, scale, alive_ch);
+  RAISE NOTICE E'\nlife game (gen=%, lifes=%)\n%',generation, lifes, separate_text(map_text, scale, scale);
 
   LOOP
     map_text := transition_life(map_text, scale, alive_ch, dead_ch);
+    lifes := count_all_lifes(map_text, scale, alive_ch);
     generation := generation + 1;
-    RAISE NOTICE E'\nlife game (gen=%)\n%',generation, separate_text(map_text, scale, scale);
+    RAISE NOTICE E'\nlife game (gen=%, lifes=%)\n%',generation, lifes, separate_text(map_text, scale, scale);
 
     lifes := count_all_lifes(map_text, scale, alive_ch);
     IF lifes = 0 THEN
