@@ -34,7 +34,7 @@ BEGIN
   loop_cnt := 0;
   -- DROP TABLE statements.
   drop_table_sql := 'DROP TABLE IF EXISTS ' || tablename ;
-  -- cREATE TANLE statements.
+  -- CREATE TANLE statements.
   create_table_sql := 'CREATE TABLE ' || tablename || '(' ;
   insert_column_sql_fragment := 'INSERT INTO ' || tablename || '(' ;
   select_sql_fragment := 'SELECT ';
